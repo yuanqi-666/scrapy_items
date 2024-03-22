@@ -62,7 +62,7 @@ class ZhiwutongSpider(scrapy.Spider):
             track_id = hashlib.md5(url.encode()).hexdigest()
             sense_item["title"] = li.css('a::text').extract_first()
             sense_item["publish_time"] = li.css('span::text').extract_first()
-            sense_item["data_url"] = url
+            sense_item["data_url"] = "https://" + url
             sense_item["data_source"] = '植物通'
             sense_item["track_id"] = track_id
             sense_item["crawler_tm"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -79,7 +79,7 @@ class ZhiwutongSpider(scrapy.Spider):
         source = ''
         for i in author_elements:
             if "来源" in i:
-                source = i
+                source = i.replace('来源：', '')
             if '作者' in i:
                 author = i.replace('作者：', '')
         sense_time["author"] = author
@@ -105,6 +105,9 @@ class ZhiwutongSpider(scrapy.Spider):
             div_content_tag = soup.find('div', attrs={"class": "TRS_Editor"})
         img_index = 0
         for i in div_content_tag.children:
+            if isinstance(i, str):  # Check if the child is a string
+                content += i + "\n"  # Append the text content directly
+                continue  # Move to the next child
             if i.name is not None:
                 if i.name == 'br':
                     content += '\n'
@@ -126,7 +129,7 @@ class ZhiwutongSpider(scrapy.Spider):
 
     def download_image(self, url, filename):
         img_dict = dict()
-        path = f"C:/Users/hayu/appen/scrapy_items/sensetime/sensetime/img/{filename}"
+        path = f"D:/scrapy_items/sensetime/sensetime/img/{filename}"
         try:
             response = requests.get(url, timeout=120)
         except:
@@ -137,7 +140,7 @@ class ZhiwutongSpider(scrapy.Spider):
             image = image.convert("RGB")
             image.save(path)
             img_dict["img_url"] = url
-            img_dict["img_path"] = f'./zhiwukepu/{filename}'
+            img_dict["img_path"] = f'./img/{filename}'
             img_dict["img_description"] = ''
             image.close()
             return img_dict
