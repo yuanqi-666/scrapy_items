@@ -1,0 +1,10 @@
+# Ignore images files
+**/*.jpg
+**/*.jpeg
+**/*.png
+**/*.gif
+**/*.pdf
+**/*.jsonl
+
+**/*.json
+**/__pycache__/
